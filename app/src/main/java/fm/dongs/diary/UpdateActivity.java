@@ -1,6 +1,5 @@
 package fm.dongs.diary;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,25 +8,25 @@ import android.widget.EditText;
 
 import io.realm.Realm;
 
-public class MainActivity extends AppCompatActivity {
+public class UpdateActivity extends AppCompatActivity {
 
     private EditText mTitleEdit;
     private EditText mContentEdit;
-    private Button mcancel_Button;
-    private Button msave_Button;
+    private Button mdel_Button;
+    private Button mupdate_Button;
     private String mTitle;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.update_item);
 
 
         mTitleEdit = (EditText) findViewById(R.id.titleEdit);
         mContentEdit = (EditText) findViewById(R.id.contentEdit);
-        msave_Button = (Button) findViewById(R.id.save_button);
-        mcancel_Button = (Button) findViewById(R.id.cancel_button);
+        mupdate_Button = (Button) findViewById(R.id.update_button);
+        mdel_Button = (Button) findViewById(R.id.del_button);
 
         View.OnClickListener firstOnClickListener = new View.OnClickListener() {
             @Override
@@ -43,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
                 Realm realm = Realm.getDefaultInstance();
 
 //           transection
+                // TODO: 2019-05-20  어떻게 해야 수정을 할수 있는가
                 realm.beginTransaction();
-                Article article = realm.createObject(Article.class);
+               // Article article = realm.createObject(Article.class);
+                ListActivity list = realm.where("titleEdit").equalTo("")
                 article.setTitle(titleText);
                 article.setContent(contentText);
                 realm.commitTransaction();
@@ -58,9 +59,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(new Intent(MainActivity.this,
-                        ListActivity.class));
-                startActivity(intent);
+                Realm.init(getApplicationContext());
+                Realm realm = Realm.getDefaultInstance();
+
+                //           transection
+
+                realm.beginTransaction();
+                final Article article = realm.where(Article.class).equalTo("title",mTitle).findFirst();
+                article.deleteFromRealm();
+                realm.commitTransaction();
+
+                finish();
+
 
 
 
@@ -69,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        msave_Button.setOnClickListener(firstOnClickListener);
-        mcancel_Button.setOnClickListener(second_OnClickListener);
+        mupdate_Button.setOnClickListener(firstOnClickListener);
+        mdel_Button.setOnClickListener(second_OnClickListener);
 
 
 //TODO: Fix
